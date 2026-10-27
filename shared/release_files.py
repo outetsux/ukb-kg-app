@@ -1,0 +1,6 @@
+"""Only artifacts required by the current deployment belong in its release."""
+RELEASE_VERSION = '202603'
+EMBEDDINGS_FILE = 'node_embeddings_202603.npz'
+DATA_FILES = frozenset(('triples_202603.csv', EMBEDDINGS_FILE,
+                        'pubmed-ukb_202603.csv', 'baseline_202603.json'))
+MODEL_FILES = frozenset(('biobert_v1.2/config.json', 'biobert_v1.2/pytorch_model.bin', 'biobert_v1.2/vocab.txt', 'en_core_sci_scibert-0.5.4/README.md', 'en_core_sci_scibert-0.5.4/attribute_ruler/patterns', 'en_core_sci_scibert-0.5.4/config.cfg', 'en_core_sci_scibert-0.5.4/lemmatizer/lookups/lookups.bin', 'en_core_sci_scibert-0.5.4/meta.json', 'en_core_sci_scibert-0.5.4/ner/cfg', 'en_core_sci_scibert-0.5.4/ner/model', 'en_core_sci_scibert-0.5.4/ner/moves', 'en_core_sci_scibert-0.5.4/parser/cfg', 'en_core_sci_scibert-0.5.4/parser/model', 'en_core_sci_scibert-0.5.4/parser/moves', 'en_core_sci_scibert-0.5.4/tagger/cfg', 'en_core_sci_scibert-0.5.4/tagger/model', 'en_core_sci_scibert-0.5.4/tokenizer', 'en_core_sci_scibert-0.5.4/transformer/cfg', 'en_core_sci_scibert-0.5.4/transformer/model', 'en_core_sci_scibert-0.5.4/vocab/key2row', 'en_core_sci_scibert-0.5.4/vocab/lookups.bin', 'en_core_sci_scibert-0.5.4/vocab/strings.json', 'en_core_sci_scibert-0.5.4/vocab/vectors', 'en_core_sci_scibert-0.5.4/vocab/vectors.cfg'))

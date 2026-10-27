@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#142D4E;background:transparent}
+label{display:block;margin-bottom:8px;font-weight:400}.field{position:relative}input{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:11px 36px 11px 12px;background:white;color:#142D4E;font:inherit;outline:none}input:focus{border-color:#147D92;box-shadow:0 0 0 1px #147D92}
+.clear{position:absolute;right:9px;top:8px;border:0;background:transparent;color:#586b80;font-size:20px;cursor:pointer}
+ul{list-style:none;margin:5px 0 0;padding:4px;border:1px solid #dbe3ec;border-radius:8px;background:white;max-height:232px;overflow:auto}li{padding:9px 10px;border-radius:5px;cursor:pointer;overflow-wrap:anywhere}li:hover,li.active{background:#e7f0f4}li[aria-selected="true"]{font-weight:600}.message{font-size:12px;color:#586b80;margin:5px 2px}.error{color:#a32d2d}[hidden]{display:none!important}
+</style></head><body>
+<label id="label" for="query"></label><div class="field"><input id="query" type="text" role="combobox" aria-autocomplete="list" aria-controls="choices" aria-expanded="false" autocomplete="off" maxlength="200"><button id="clear" class="clear" type="button" aria-label="Clear entity">×</button></div>
+<ul id="choices" role="listbox" hidden></ul><div id="message" class="message" aria-live="polite"></div>
+<script>
+const input=document.getElementById('query'),list=document.getElementById('choices'),message=document.getElementById('message');
+let args={},open=false,active=-1,timer=null,rows=[],selected=null,first=true,serial=0,pendingId=null;
+function post(type,extra={}){window.parent.postMessage({isStreamlitMessage:true,type,...extra},'*')}
+function height(){post('streamlit:setFrameHeight',{height:document.body.scrollHeight+4})}
+function send(kind,extra={}){pendingId=Date.now()+':'+(++serial);post('streamlit:setComponentValue',{value:{kind,...extra,event_id:pendingId},dataType:'json'})}
+function expand(value){open=value;input.setAttribute('aria-expanded',String(value));list.hidden=!value;paint()}
+function choose(row){clearTimeout(timer);selected=row.id;input.value=row.id===null?'':row.name;active=-1;expand(false);send('select',{id:row.id})}
+function paint(){
+ rows=[];list.replaceChildren();
+ if(args.optional)rows.push({id:null,name:'Any entity',type:''});
+ if(input.value===args.query)rows.push(...(args.nodes||[]));
+ rows.forEach((row,i)=>{const li=document.createElement('li');li.id='choice-'+i;li.role='option';li.textContent=row.id===null?'Any entity':row.name+' · '+row.type;li.setAttribute('aria-selected',String(row.id===selected));if(i===active)li.className='active';li.addEventListener('mousedown',e=>e.preventDefault());li.addEventListener('click',()=>choose(row));list.append(li)});
+ if(active>=0&&active<rows.length){input.setAttribute('aria-activedescendant','choice-'+active);list.children[active].scrollIntoView({block:'nearest'})}else input.removeAttribute('aria-activedescendant');
+ const waiting=input.value!==args.query;
+ message.className='message'+(args.error&&!waiting?' error':'');
+ message.textContent=!open?'':waiting?'Searching…':args.error||(!input.value?'Type an entity name to search.':!(args.nodes||[]).length?'No entities found. Try another name.':args.suggestions?'Similar names — select the intended entity.':'');
+ list.hidden=!open;document.getElementById('clear').hidden=!input.value;height();
+}
+input.addEventListener('focus',()=>expand(true));
+input.addEventListener('click',()=>expand(true));
+input.addEventListener('input',()=>{selected=null;active=-1;open=true;input.setAttribute('aria-expanded','true');paint();clearTimeout(timer);timer=setTimeout(()=>{send('search',{query:input.value})},350)});
+input.addEventListener('blur',()=>{open=false;paint();input.setAttribute('aria-expanded','false')});
+input.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();open=true;input.setAttribute('aria-expanded','true');active=Math.max(0,Math.min(rows.length-1,active+(e.key==='ArrowDown'?1:-1)));paint()}else if(e.key==='Enter'){e.preventDefault();if(open&&active>=0&&rows[active])choose(rows[active])}else if(e.key==='Escape'){expand(false)}});
+document.getElementById('clear').addEventListener('click',()=>{clearTimeout(timer);input.value='';selected=null;send('clear');input.focus();expand(true)});
+window.addEventListener('message',e=>{if(e.source!==window.parent||e.data.type!=='streamlit:render')return;
+ // Streamlit renders once with the previous state before Python handles the event.
+ // Wait for acknowledgement so an old selection cannot overwrite the user's choice.
+ if(pendingId&&e.data.args.event_id!==pendingId)return;
+ pendingId=null;args=e.data.args;selected=args.selected?args.selected.id:null;
+ document.getElementById('label').textContent=args.label;input.placeholder=args.optional?'Any entity':'Type to search and select an entity';
+ if(first){input.value=args.selected?args.selected.name:args.query||'';selected=args.selected?args.selected.id:null;first=false}
+ if(args.selected){selected=args.selected.id;if(document.activeElement!==input)input.value=args.selected.name}
+ paint();
+});
+post('streamlit:componentReady',{apiVersion:1});height();
+</script></body></html>

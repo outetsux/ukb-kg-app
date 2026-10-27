@@ -1,0 +1,9 @@
+[
+  {
+    "name": "OpenAI",
+    "base_url": "https://api.openai.com/v1",
+    "api": "responses",
+    "models": ["gpt-5-mini"],
+    "default_model": "gpt-5-mini"
+  }
+]

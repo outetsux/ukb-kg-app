@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 240 56">
+  <g stroke="#147D92" stroke-width="2.4"><path d="M12 35L28 12L45 36L12 35M28 12L29 43" fill="none"/></g>
+  <g fill="#147D92"><circle cx="12" cy="35" r="5"/><circle cx="28" cy="12" r="6"/><circle cx="45" cy="36" r="5"/><circle cx="29" cy="43" r="4"/></g>
+  <text x="62" y="36" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#142D4E">UKB-KG</text>
+</svg>

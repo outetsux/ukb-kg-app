@@ -1,0 +1,24 @@
+# Private owner workspace is never part of the public repository.
+/_private/
+/.local/
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+*.log
+*.pem
+*.key
+*.npz
+*.bin
+*.pt
+*.pth
+*.safetensors
+/data/
+/models/
+/dist/

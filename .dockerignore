@@ -1,0 +1,7 @@
+_private
+.git
+.env*
+.streamlit/secrets.toml
+.local
+.venv
+__pycache__
